@@ -11,6 +11,9 @@ __pycache__/
 build/
 lama/
 LaMa_test_images/
+LaMa_test_images.zip
+big-lama/
+big-lama.zip
 develop-eggs/
 dist/
 downloads/
