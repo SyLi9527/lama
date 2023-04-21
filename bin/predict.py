@@ -38,7 +38,8 @@ LOGGER = logging.getLogger(__name__)
 @hydra.main(config_path='../configs/prediction', config_name='default.yaml')
 def main(predict_config: OmegaConf):
     try:
-        register_debug_signal_handlers()  # kill -10 <pid> will result in traceback dumped into log
+        if sys.platform != 'win32':
+            register_debug_signal_handlers()  
 
         device = torch.device(predict_config.device)
 
@@ -71,6 +72,7 @@ def main(predict_config: OmegaConf):
             )
             os.makedirs(os.path.dirname(cur_out_fname), exist_ok=True)
             batch = default_collate([dataset[img_i]])
+            print(batch)
             if predict_config.get('refine', False):
                 assert 'unpad_to_size' in batch, "Unpadded size is required for the refinement"
                 # image unpadding is taken care of in the refiner, so that output image

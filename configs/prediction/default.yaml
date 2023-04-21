@@ -2,15 +2,15 @@ indir: no  # to be overriden in CLI
 outdir: no  # to be overriden in CLI
 
 model:
-  path: no  # to be overriden in CLI
+  path: big-lama  # to be overriden in CLI
   checkpoint: best.ckpt
 
 dataset:
-  kind: default
+  kind: b64
   img_suffix: .png
   pad_out_to_modulo: 8
 
-device: cuda
+device: cpu
 out_key: inpainted
 
 refine: False # refiner will only run if this is True

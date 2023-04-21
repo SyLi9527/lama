@@ -45,6 +45,12 @@ class DefaultInpaintingTrainingModule(BaseInpaintingTrainingModule):
             self.fake_fakes_gen = FakeFakesGenerator(**(fake_fakes_generator_kwargs or {}))
 
     def forward(self, batch):
+        # if type(batch) is dict:
+        #     print(batch['image'].shape)
+        #     print(batch['mask'].shape)
+        #     pass
+        # else:
+        #     batch = {'image': batch[:, :3, :, :], 'mask': batch[:, 3:, :, :]}
         if self.training and self.rescale_size_getter is not None:
             cur_size = self.rescale_size_getter(self.global_step)
             batch['image'] = F.interpolate(batch['image'], size=cur_size, mode='bilinear', align_corners=False)

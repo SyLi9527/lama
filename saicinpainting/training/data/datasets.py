@@ -14,13 +14,10 @@ from skimage.feature import canny
 from skimage.transform import rescale, resize
 from torch.utils.data import Dataset, IterableDataset, DataLoader, DistributedSampler, ConcatDataset
 
-from saicinpainting.evaluation.data import InpaintingDataset as InpaintingEvaluationDataset, \
+from saicinpainting.evaluation.data import b64InpaintingDataset as b64InpaintingEvaluationDataset, InpaintingDataset as InpaintingEvaluationDataset, \
     OurInpaintingDataset as OurInpaintingEvaluationDataset, ceil_modulo, InpaintingEvalOnlineDataset
 from saicinpainting.training.data.aug import IAAAffine2, IAAPerspective2
 from saicinpainting.training.data.masks import get_mask_generator
-
-LOGGER = logging.getLogger(__name__)
-
 
 class InpaintingTrainDataset(Dataset):
     def __init__(self, indir, mask_generator, transform):
@@ -246,36 +243,16 @@ def make_default_train_dataloader(indir, kind='default', out_size=512, mask_gen_
     return dataloader
 
 
-def make_default_val_dataset(indir, kind='default', out_size=512, transform_variant='default', **kwargs):
+def make_default_val_dataset(indir, kind='b64', out_size=512, transform_variant='default', b64_image=None, b64_mask=None, **kwargs):
     if OmegaConf.is_list(indir) or isinstance(indir, (tuple, list)):
         return ConcatDataset([
             make_default_val_dataset(idir, kind=kind, out_size=out_size, transform_variant=transform_variant, **kwargs) for idir in indir 
         ])
 
-    LOGGER.info(f'Make val dataloader {kind} from {indir}')
-    mask_generator = get_mask_generator(kind=kwargs.get("mask_generator_kind"), kwargs=kwargs.get("mask_gen_kwargs"))
-
     if transform_variant is not None:
         transform = get_transforms(transform_variant, out_size)
 
-    if kind == 'default':
-        dataset = InpaintingEvaluationDataset(indir, **kwargs)
-    elif kind == 'our_eval':
-        dataset = OurInpaintingEvaluationDataset(indir, **kwargs)
-    elif kind == 'img_with_segm':
-        dataset = ImgSegmentationDataset(indir=indir,
-                                         mask_generator=mask_generator,
-                                         transform=transform,
-                                         out_size=out_size,
-                                         **kwargs)
-    elif kind == 'online':
-        dataset = InpaintingEvalOnlineDataset(indir=indir,
-                                              mask_generator=mask_generator,
-                                              transform=transform,
-                                              out_size=out_size,
-                                              **kwargs)
-    else:
-        raise ValueError(f'Unknown val dataset kind {kind}')
+    dataset = b64InpaintingEvaluationDataset(b64_image, b64_mask, **kwargs)
 
     return dataset
 
