@@ -14,6 +14,14 @@ LaMa_test_images/
 LaMa_test_images.zip
 big-lama/
 big-lama.zip
++big-lama.zip
+big-lama/
+LaMa_models/
+LaMa_test_images.zip
+LaMa_test_images/
+lama-models.zip
+outputs/
+output/
 develop-eggs/
 dist/
 downloads/
